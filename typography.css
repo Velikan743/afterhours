@@ -1,0 +1,18 @@
+/* Slightly larger type for form guidance and chat copy across the app. */
+body{font-size:15px}
+.auth-eyebrow,.story-kicker,.auth-form>label,.auth-two-col label,.label-row label,.panel-kicker{font-size:10px}
+.sidebar-label{font-size:11px}
+.auth-input,.composer input,.input-wrap input,.create-modal textarea{font-size:13px}
+.auth-subtitle,.reset-copy,.welcome-state p,.message-text,.modal p{font-size:13px}
+.auth-submit,.button,.text-link{font-size:13px}
+.auth-switch,.attempt-hint,.auth-feedback,.auth-config-note,.profile-copy small,.room-description,.people-footer,.people-empty,.person-name{font-size:11px}
+.welcome-eyebrow,.modal-kicker{font-size:11px}
+.welcome-foot,.composer-foot,.date-divider,.message-meta time{font-size:10px}
+.story-foot,.auth-legal{font-size:9px}
+.profile-copy strong,.message-meta strong{font-size:13px}
+.people-header h2{font-size:15px}
+.room-item{font-size:14px}
+.avatar-small{font-size:13px}
+.message-avatar,.person-row .avatar{font-size:11px}
+.create-modal label{font-size:10px}
+.room-kicker{font-size:9px}
