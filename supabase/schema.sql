@@ -31,20 +31,22 @@ alter table public.rooms enable row level security;
 alter table public.room_members enable row level security;
 alter table public.messages enable row level security;
 
+-- Keep API table access explicit. This also works when the project is created
+-- with "Automatically expose new tables" disabled.
+grant usage on schema public to authenticated;
+revoke all on table public.rooms, public.room_members, public.messages from anon, authenticated;
+grant select, insert on table public.rooms to authenticated;
+grant select, insert on table public.room_members to authenticated;
+grant select, insert, update, delete on table public.messages to authenticated;
+
 drop policy if exists "Signed-in users can read rooms" on public.rooms;
 create policy "Signed-in users can read rooms" on public.rooms for select to authenticated using (true);
 drop policy if exists "Users create rooms as themselves" on public.rooms;
 create policy "Users create rooms as themselves" on public.rooms for insert to authenticated with check (created_by = (select auth.uid()));
-drop policy if exists "Room owners can delete rooms" on public.rooms;
-create policy "Room owners can delete rooms" on public.rooms for delete to authenticated using (created_by = (select auth.uid()));
-
 drop policy if exists "Members can read their membership" on public.room_members;
 create policy "Members can read their membership" on public.room_members for select to authenticated using (user_id = (select auth.uid()));
 drop policy if exists "Users can join as themselves" on public.room_members;
 create policy "Users can join as themselves" on public.room_members for insert to authenticated with check (user_id = (select auth.uid()));
-drop policy if exists "Users can leave as themselves" on public.room_members;
-create policy "Users can leave as themselves" on public.room_members for delete to authenticated using (user_id = (select auth.uid()));
-
 drop policy if exists "Room members can read messages" on public.messages;
 create policy "Room members can read messages" on public.messages for select to authenticated using (
   exists (select 1 from public.room_members rm where rm.room_id = messages.room_id and rm.user_id = (select auth.uid()))

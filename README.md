@@ -19,7 +19,7 @@ flowchart LR
 2. Open **SQL Editor** in Supabase and run [`supabase/schema.sql`](supabase/schema.sql).
 3. Under **Authentication → Providers → Email**, keep email/password sign-in enabled. Leave email confirmation enabled so new accounts verify their address.
 4. Under **Authentication → URL Configuration**, set the Site URL to your local origin. Add these URLs to the redirect allow list: `http://localhost:4173/**`, `http://localhost:4173/reset-password.html`, `https://your-site.vercel.app/**`, and `https://your-site.vercel.app/reset-password.html` (replace the example domain after deployment).
-5. Copy the Project URL and anon/public key from **Project Settings → API** into [`config.js`](config.js). The anon key is intended for browser use; never put a service-role key here.
+5. Copy the Project URL and publishable key (or legacy anon key) from **Project Settings → API Keys** into [`config.js`](config.js). These keys are intended for browser use; never put a secret or service-role key here.
 6. Serve the project directory with any static server. With Python installed:
 
    ```powershell

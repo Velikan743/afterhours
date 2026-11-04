@@ -1,6 +1,6 @@
-// Add your Supabase project credentials here. These are safe to use in a browser
+// The project URL and publishable (or legacy anon) key are safe for browser use
 // when Row Level Security is enabled for every exposed table.
 window.AFTERHOURS_CONFIG = {
-  supabaseUrl: "https://YOUR_PROJECT_REF.supabase.co",
-  supabaseAnonKey: "YOUR_SUPABASE_ANON_KEY",
+  supabaseUrl: "https://juxvqfwnsrouoydbqoqh.supabase.co",
+  supabaseAnonKey: "sb_publishable_5nsgdw0PvxtC-dJYsERMzA_cWLrFPSb",
 };
