@@ -127,7 +127,22 @@
   document.querySelectorAll('[data-show-view]').forEach(button=>button.addEventListener('click',()=>showAuth(button.dataset.showView)));
   $('loginForm').addEventListener('submit',submitLogin);$('signupForm').addEventListener('submit',submitSignup);$('forgotForm').addEventListener('submit',submitForgot);$('loginEmail').addEventListener('input',updateLoginLimit);
   document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>$(b.dataset.close).close()));
-  $('createRoomForm').addEventListener('submit',async e=>{e.preventDefault();if(!db||!user)return;const name=escapeRoomName($('roomNameInput').value);if(!name){notify('Choose a room name with letters or numbers.');return}const description=$('roomDescriptionInput').value.trim()||null;const visibility=document.querySelector('input[name="roomVisibility"]:checked')?.value||'public';const {data,error}=await db.from('rooms').insert({name,description,created_by:user.id,is_private:visibility==='private'}).select().single();if(error){notify(error.message.includes('duplicate')?'That room name is already taken.':error.message);return}rooms.push(data);ui.createModal.close();e.target.reset();renderRooms();await joinRoom(data);notify(data.is_private?'Private room ready. Share its invite link.':'Public room ready to discover.')});
+  $('createRoomForm').addEventListener('submit',async e=>{
+    e.preventDefault();setFeedback('createRoomFeedback','');
+    if(!db){setFeedback('createRoomFeedback','Supabase is not connected. Refresh the page and try again.');return}
+    if(!user){setFeedback('createRoomFeedback','Sign in before creating a room.');return}
+    const name=escapeRoomName($('roomNameInput').value);
+    if(!name){setFeedback('createRoomFeedback','Enter a room name using letters or numbers.');$('roomNameInput').focus();return}
+    const description=$('roomDescriptionInput').value.trim()||null;
+    const visibility=document.querySelector('input[name="roomVisibility"]:checked')?.value||'public';
+    const button=$('createRoomSubmit');button.disabled=true;button.firstChild.textContent='Creating…';
+    try{
+      const {data,error}=await db.from('rooms').insert({name,description,created_by:user.id,is_private:visibility==='private'}).select().single();
+      if(error){setFeedback('createRoomFeedback',error.message.includes('duplicate')?'That room name is already taken.':`Could not create room: ${error.message}`);return}
+      rooms.push(data);ui.createModal.close();e.target.reset();renderRooms();await joinRoom(data);notify(data.is_private?'Private room ready. Share its invite link.':'Public room ready to discover.');
+    }catch(error){setFeedback('createRoomFeedback',`Could not create room: ${error.message||'Please try again.'}`)}
+    finally{button.disabled=false;button.firstChild.textContent='Create your room '}
+  });
   $('messageForm').addEventListener('submit',async e=>{e.preventDefault();const content=ui.messageInput.value.trim();if(!content||!user||!currentRoom)return;ui.messageInput.value='';const {error}=await db.from('messages').insert({room_id:currentRoom.id,user_id:user.id,author_name:displayName(user),content});if(error){ui.messageInput.value=content;notify(error.message)}});
   ui.messageInput.addEventListener('input',()=>{if(!roomChannel||!user)return;const now=Date.now();if(now-sentTyping>900){sentTyping=now;roomChannel.send({type:'broadcast',event:'typing',payload:{user_id:user.id,name:displayName(user),typing:true}})}});
   $('emojiButton').addEventListener('click',()=>{ui.messageInput.value+='👋';ui.messageInput.focus()});$('inviteButton').addEventListener('click',async()=>{if(!currentRoom){notify('Open a room first to invite your people.');return}const url=currentRoom.is_private?`${location.origin}${location.pathname}?invite=${encodeURIComponent(currentRoom.invite_code)}`:`${location.origin}${location.pathname}?room=${encodeURIComponent(currentRoom.id)}`;try{await navigator.clipboard.writeText(url);notify('Room link copied.')}catch{prompt('Copy this room link',url)}});
