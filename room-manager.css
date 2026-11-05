@@ -27,3 +27,8 @@
 .send-button{width:27px;height:27px}
 .composer-foot{padding-top:2px;padding-bottom:5px}
 @media(max-width:650px){.topbar{height:42px;flex-basis:42px;padding-inline:12px}.room-intro{min-height:46px;padding:5px 12px}.room-symbol{width:27px;height:27px}.composer{min-height:38px}.composer-foot{padding-top:2px;padding-bottom:4px}}
+.message-stream{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--room-accent,var(--green)) 58%,#263029) transparent}
+.message-stream::-webkit-scrollbar{width:9px}
+.message-stream::-webkit-scrollbar-track{background:color-mix(in srgb,var(--room-surface,#111714) 85%,transparent);border-left:1px solid var(--room-border,var(--border))}
+.message-stream::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--room-accent,var(--green)) 36%,#29332c);border:2px solid var(--room-surface,#111714);border-radius:999px}
+.message-stream::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb,var(--room-accent,var(--green)) 65%,#29332c)}
