@@ -166,6 +166,8 @@
   async function goHome(){await leaveRoom();history.replaceState(null,'',location.pathname);ui.currentRoomName.textContent='welcome';ui.chat.classList.add('hidden');ui.welcome.classList.remove('hidden');renderRooms()}
   $('homeBrand').addEventListener('click',event=>{event.preventDefault();$('sidebar').classList.remove('open');goHome()});
   $('profileMenuButton').addEventListener('click',event=>{event.stopPropagation();const popover=$('profilePopover');const opening=popover.classList.contains('hidden');popover.classList.toggle('hidden',!opening);$('profileMenuButton').setAttribute('aria-expanded',String(opening))});
+  const syncSiteThemeChoices=()=>document.querySelectorAll('[data-site-theme-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.siteThemeChoice===document.documentElement.dataset.siteThemePreference)));
+  document.querySelectorAll('[data-site-theme-choice]').forEach(button=>button.addEventListener('click',()=>{window.setAfterhoursSiteTheme(button.dataset.siteThemeChoice);syncSiteThemeChoices()}));syncSiteThemeChoices();
   $('logoutButton').addEventListener('click',async()=>{ $('profilePopover').classList.add('hidden');$('profileMenuButton').setAttribute('aria-expanded','false');const {error}=await db.auth.signOut();if(error)notify(error.message)});
   document.addEventListener('click',event=>{if(!event.target.closest('.profile-menu-wrap')){$('profilePopover').classList.add('hidden');$('profileMenuButton').setAttribute('aria-expanded','false')}});
   $('homeButton').addEventListener('click',goHome);

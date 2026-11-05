@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#0b0f0e" />
     <meta name="description" content="A quiet corner of the internet. Find your people and talk in real time." />
     <title>afterhours — real-time chat</title>
+    <script src="site-theme.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -14,6 +15,7 @@
     <link rel="stylesheet" href="room-discovery.css" />
     <link rel="stylesheet" href="account-settings.css" />
     <link rel="stylesheet" href="room-manager.css" />
+    <link rel="stylesheet" href="site-theme.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script defer src="app.js"></script>
@@ -83,7 +85,7 @@
             <span class="avatar avatar-small" id="profileAvatar">?</span>
             <span class="profile-copy"><strong id="profileName">Guest</strong><small id="profileStatus">Not signed in</small></span>
             <div class="profile-menu-wrap"><button class="profile-menu-button" id="profileMenuButton" type="button" aria-label="Open account menu" aria-haspopup="true" aria-expanded="false">···</button>
-              <div class="profile-popover hidden" id="profilePopover"><a href="settings.html">Account settings</a><button id="logoutButton" type="button">Log out</button></div>
+              <div class="profile-popover hidden" id="profilePopover"><a href="settings.html">Account settings</a><div class="site-theme-picker" role="group" aria-label="Website appearance"><span>Website appearance</span><button type="button" data-site-theme-choice="current" title="Follow your device appearance">Current</button><button type="button" data-site-theme-choice="light">Light mode</button><button type="button" data-site-theme-choice="dark">Dark mode</button></div><button id="logoutButton" type="button">Log out</button></div>
             </div>
           </div>
         </div>
