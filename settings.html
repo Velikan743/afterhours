@@ -23,6 +23,11 @@
       <section class="settings-content">
         <div class="settings-heading"><span class="auth-eyebrow">YOUR ACCOUNT</span><h1>Account settings</h1><p>Keep your profile up to date and manage your sign-in details.</p></div>
         <section class="settings-card">
+          <div class="settings-card-heading"><div><h2>Email two-factor authentication</h2><p>Require an emailed 8-character code after your password at sign-in.</p></div></div>
+          <div class="twofa-row"><div><strong id="twofaStatus">Checking status…</strong><p id="twofaDescription">A verification code will be sent to your account email.</p></div><button class="button button-primary" id="twofaAction" type="button" disabled>Loading…</button></div>
+          <form class="settings-form hidden" id="twofaVerifyForm"><label for="twofaCode">8-CHARACTER EMAIL CODE</label><input class="auth-input" id="twofaCode" type="text" minlength="8" maxlength="8" pattern="[A-Za-z0-9]{8}" autocomplete="one-time-code" inputmode="text" required /><p class="settings-feedback" id="twofaFeedback" role="status" aria-live="polite"></p><button class="auth-submit" id="twofaVerify" type="submit">Verify code <span>↗</span></button></form>
+        </section>
+        <section class="settings-card">
           <div class="settings-card-heading"><div><h2>Your profile</h2><p>This is how people see you in rooms.</p></div></div>
           <form id="profileForm" class="settings-form">
             <div class="avatar-editor"><span class="avatar settings-avatar" id="avatarPreview">?</span><div><label class="button button-quiet upload-button" for="avatarFile">Choose a profile picture</label><input class="visually-hidden" id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" /><p>PNG, JPG, WebP, or GIF. Up to 2 MB.</p></div></div>

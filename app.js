@@ -33,8 +33,17 @@
     if(!db){setFeedback('loginFeedback','Connect Supabase in config.js before signing in.');return}
     if(attemptsFor(email)>=5){updateLoginLimit();setFeedback('loginFeedback','This email has reached the five-attempt limit on this browser. Reset the password to continue.');return}
     const button=$('loginSubmit');button.disabled=true;button.dataset.idleText='Sign in';button.firstChild.textContent='Signing in…';setFeedback('loginFeedback','');
-    const {error}=await db.auth.signInWithPassword({email,password});
-    if(error){
+    let loginError=null;
+    try {
+      const {data,error}=await db.functions.invoke('email-2fa',{body:{action:'login',email,password}});
+      if(error) throw new Error(error.message||'Unable to sign in right now. Please try again.');
+      if(data?.error) throw new Error(data.error);
+      if(data?.challengeId){sessionStorage.setItem('afterhours.pending-login-challenge',data.challengeId);location.assign('verify-2fa.html');return}
+      if(!data?.session?.access_token||!data?.session?.refresh_token)throw new Error(data?.error||'Sign-in did not return a session.');
+      const {error:setError}=await db.auth.setSession(data.session);if(setError)throw setError;
+    } catch(error){loginError=error}
+    if(loginError){
+      const error=loginError;
       const countsAsFailure=error.code==='invalid_credentials'||((error.status===400||error.status===401)&&error.code!=='email_not_confirmed')||/invalid login credentials/i.test(error.message||'');
       if(countsAsFailure){const count=Math.min(5,attemptsFor(email)+1);try{localStorage.setItem(attemptKey(email),String(count))}catch{};updateLoginLimit();setFeedback('loginFeedback',count>=5?'That was attempt 5 of 5. Reset your password to sign in again.':`Email or password is incorrect. ${5-count} attempt${5-count===1?'':'s'} remaining.`)}
       else setFeedback('loginFeedback',error.message||'Unable to sign in right now. Please try again.');

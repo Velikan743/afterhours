@@ -1,12 +1,14 @@
 # afterhours
 
-A small real-time room chat built with a static frontend and Supabase. The browser talks directly to Supabase Auth, Postgres, and Realtime; there is no custom application server.
+A small real-time room chat built with a static frontend and Supabase. The browser talks to Supabase Auth, Postgres, Realtime, and an Edge Function for opt-in email two-factor sign-in.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  Browser[afterhours web app] -->|Email + password| Auth[Supabase Auth]
+  Browser[afterhours web app] -->|Email + password| Function[Supabase Edge Function]
+  Function -->|Password verification| Auth[Supabase Auth]
+  Function -->|One-time code email| Resend[Resend]
   Browser -->|queries + RLS| DB[(Supabase Postgres)]
   DB -->|message changes| Browser
   Browser <-->|typing broadcast + presence| Realtime[Supabase Realtime]
@@ -16,19 +18,20 @@ flowchart LR
 ## Run locally
 
 1. Create a Supabase project on the free tier.
-2. Open **SQL Editor** in Supabase and run [`supabase/schema.sql`](supabase/schema.sql). If the original schema is already installed, run [`supabase/rooms-privacy-migration.sql`](supabase/rooms-privacy-migration.sql) instead. Existing rooms remain public. Before deploying the frontend, run [`supabase/account-settings-migration.sql`](supabase/account-settings-migration.sql), [`supabase/room-customization-migration.sql`](supabase/room-customization-migration.sql), [`supabase/room-read-state-migration.sql`](supabase/room-read-state-migration.sql), [`supabase/room-theme-variety-migration.sql`](supabase/room-theme-variety-migration.sql), [`supabase/custom-room-background-migration.sql`](supabase/custom-room-background-migration.sql), [`supabase/room-background-size-migration.sql`](supabase/room-background-size-migration.sql), and [`supabase/room-logo-migration.sql`](supabase/room-logo-migration.sql). These migrations add account avatars, room themes and assets, unread positions, custom backgrounds, and room logos.
+2. Open **SQL Editor** in Supabase and run [`supabase/schema.sql`](supabase/schema.sql). If the original schema is already installed, run [`supabase/rooms-privacy-migration.sql`](supabase/rooms-privacy-migration.sql) instead. Existing rooms remain public. Run the account, room, and storage migrations listed in [`supabase`](supabase/), then run [`supabase/email-2fa-migration.sql`](supabase/email-2fa-migration.sql) last to add verified-session protection for accounts that opt into 2FA.
 3. Under **Authentication → Providers → Email**, keep email/password sign-in enabled. Leave email confirmation enabled so new accounts verify their address.
 4. Under **Authentication → URL Configuration**, set the Site URL to your local origin. Add these URLs to the redirect allow list: `http://localhost:4173/**`, `http://localhost:4173/reset-password.html`, `https://your-site.vercel.app/**`, and `https://your-site.vercel.app/reset-password.html` (replace the example domain after deployment).
 5. Copy the Project URL and publishable key (or legacy anon key) from **Project Settings → API Keys** into [`config.js`](config.js). These keys are intended for browser use; never put a secret or service-role key here.
-6. Serve the project directory with any static server. With Python installed:
+6. Set up Resend and verify a sender address/domain. Install the Supabase CLI and link this project. Set Edge Function secrets `RESEND_API_KEY`, `EMAIL_2FA_FROM`, `EMAIL_2FA_CODE_SECRET`, and `EMAIL_2FA_ENCRYPTION_SECRET` with `supabase secrets set`. Supabase provides the service-role key to functions at runtime. Use long random values for the last two. Never put these values in frontend code or GitHub. Deploy with `supabase functions deploy email-2fa --no-verify-jwt`.
+7. Serve the project directory with any static server. With Python installed:
 
    ```powershell
    python -m http.server 4173
    ```
 
-7. Open `http://localhost:4173`, create an account with your email, mobile number, username, and password, and confirm the address from your email. The home page lists public rooms and lets you search by name. Create either a public room or a private room; private rooms are hidden from discovery and can only be joined from their invite link. Room creators own their rooms, can upload a room logo, and can select from twenty varied visual themes or upload a custom room background image and manage up to 50 custom emoji and 10 stickers per room. Members can insert custom emoji into messages or send a sticker. Use the three-dot profile menu to switch the website between medium, light, and Discord-inspired AMOLED dark appearances, edit account details, choose a profile picture, or change your password. Open the site in a second browser window with another account to try live chat.
+8. Open `http://localhost:4173`, create an account with your email, mobile number, username, and password, and confirm the address from your email. In Account Settings, turn on email 2FA and verify the emailed code. The home page lists public rooms and lets you search by name. Create either a public room or a private room; private rooms are hidden from discovery and can only be joined from their invite link. Room creators own their rooms, can upload a room logo, and can select from twenty varied visual themes or upload a custom room background image and manage up to 50 custom emoji and 10 stickers per room. Members can insert custom emoji into messages or send a sticker. Use the three-dot profile menu to switch the website between medium, light, and Discord-inspired AMOLED dark appearances, edit account details, choose a profile picture, or change your password. Open the site in a second browser window with another account to try live chat.
 
-The mobile number and username are stored as Supabase Auth user metadata. The mobile number is collected but not SMS-verified. The login screen locks that email after five incorrect-password responses in the current browser and offers password reset. This browser-side counter is a usability guard, not a security boundary: clearing browser storage or using another browser bypasses it. For a strict cross-device five-attempt lockout, add a server-side rate limiter, such as a Supabase Edge Function, in front of password sign-in.
+The mobile number and username are stored as Supabase Auth user metadata. The mobile number is collected but not SMS-verified. The login screen limits an email to five incorrect-password attempts in the current browser; this remains a usability guard, not a cross-device lockout. Email 2FA codes expire after ten minutes and allow five verification attempts. The Edge Function holds the Auth session encrypted until code verification, and the SQL migration gates room data by the verified Auth session ID.
 
 Password recovery uses Supabase Auth email delivery and returns to `reset-password.html`. Supabase's default email sender is for trying out the flow and has tight rate limits; configure SMTP in Supabase for dependable delivery.
 
