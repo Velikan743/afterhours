@@ -42,6 +42,13 @@
         <p class="settings-footer">Your account email can’t be changed here.</p>
       </section>
     </main>
+    <dialog class="crop-dialog" id="cropDialog" aria-labelledby="cropTitle">
+      <button class="modal-close" id="cropClose" type="button" aria-label="Cancel crop">×</button>
+      <span class="auth-eyebrow">PROFILE PICTURE</span><h2 id="cropTitle">Adjust your picture</h2><p class="crop-copy">Drag the image to position it. Use the slider to zoom in or out.</p>
+      <div class="crop-viewport" id="cropViewport"><img id="cropImage" alt="Adjustable profile picture crop" draggable="false" /></div>
+      <label class="zoom-control" for="cropZoom">ZOOM <input id="cropZoom" type="range" min="1" max="3" value="1" step="0.01" /></label>
+      <div class="crop-actions"><button class="button button-quiet" id="cropCancel" type="button">Cancel</button><button class="button button-primary" id="cropApply" type="button">Use this picture <span>↗</span></button></div>
+    </dialog>
     <div class="toast" id="settingsToast" role="status" aria-live="polite"></div>
   </body>
 </html>
