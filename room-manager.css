@@ -65,3 +65,4 @@
 .custom-theme-controls input[type="file"]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .custom-theme-controls .button{padding:8px 10px;font-size:11px}
 .custom-theme-controls .button-quiet{border:1px solid #3a3c32}
+.custom-theme-file-name{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aab5a8;font:10px var(--mono)}
