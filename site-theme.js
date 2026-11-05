@@ -1,16 +1,14 @@
 (() => {
   const key = 'afterhours-site-theme';
-  const media = window.matchMedia('(prefers-color-scheme: light)');
   function preference() {
     try { return localStorage.getItem(key) || 'current'; }
     catch { return 'current'; }
   }
   function apply() {
     const selected = preference();
-    const mode = selected === 'current' ? (media.matches ? 'light' : 'dark') : selected;
-    document.documentElement.dataset.siteTheme = mode;
+    document.documentElement.dataset.siteTheme = selected;
     document.documentElement.dataset.siteThemePreference = selected;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', mode === 'light' ? '#f4f6f2' : '#0b0f0e');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', selected === 'light' ? '#f4f6f2' : selected === 'dark' ? '#313338' : '#242a31');
   }
   window.setAfterhoursSiteTheme = (selected) => {
     if (!['current', 'light', 'dark'].includes(selected)) return;
@@ -19,6 +17,5 @@
     apply();
   };
   apply();
-  media.addEventListener?.('change', () => { if (preference() === 'current') apply(); });
   window.addEventListener('storage', (event) => { if (event.key === key) apply(); });
 })();
