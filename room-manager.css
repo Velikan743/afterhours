@@ -66,3 +66,11 @@
 .custom-theme-controls .button{padding:8px 10px;font-size:11px}
 .custom-theme-controls .button-quiet{border:1px solid #3a3c32}
 .custom-theme-file-name{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aab5a8;font:10px var(--mono)}
+.room-symbol{overflow:hidden;padding:0}
+.room-symbol img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.room-list-logo{width:24px;height:24px;flex:none;object-fit:cover;border:1px solid #344037;border-radius:6px}
+.room-logo-section{border-top:1px solid #263129;padding-top:17px;margin-top:18px}
+.room-logo-preview{width:50px;height:50px;display:grid;place-items:center;overflow:hidden;margin-top:12px;border:1px solid #344037;border-radius:12px;background:#1a241b;color:#a8c980;font:18px var(--mono)}
+.room-logo-preview img{width:100%;height:100%;object-fit:cover}
+.room-logo-actions{display:flex;align-items:center;gap:8px}
+.room-logo-actions .button{padding:8px 11px;font-size:11px}

@@ -1,4 +1,11 @@
 .room-search,.directory-search{display:flex;align-items:center;gap:9px;border:1px solid #263129;background:#111713;border-radius:7px;padding:0 10px;color:#8b9b82}
+.public-room-identity{display:flex;align-items:center;gap:12px;width:100%;min-width:0;margin:13px 0 12px}
+.public-room-logo{width:48px;height:48px;flex:none;display:grid;place-items:center;overflow:hidden;border:1px solid #344037;border-radius:12px;background:#1a241b;color:#a8c980;font:19px var(--mono)}
+.public-room-logo img{width:100%;height:100%;object-fit:cover}
+.public-room-copy{flex:1;min-width:0}
+.public-room-card .public-room-copy h3{margin:0 0 4px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.public-room-card .public-room-copy p{margin:0}
+.public-room-card>.room-card-badge{align-self:flex-start}
 .crumb-home{border:0;padding:0;background:transparent;color:#77817a;font:inherit;cursor:pointer}.crumb-home:hover{color:var(--green)}
 .room-search{height:36px;margin:0 0 12px}.room-search input,.directory-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:12px var(--font)}
 .room-search input::placeholder,.directory-search input::placeholder{color:#667268}.room-search:focus-within,.directory-search:focus-within{border-color:#596f48}
