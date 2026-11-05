@@ -9,3 +9,6 @@
 .room-intro{padding:12px 32px;min-height:70px;gap:11px}
 .room-symbol{width:35px;height:35px}
 @media(max-width:650px){.topbar{height:56px;flex-basis:56px}.room-intro{min-height:58px;padding:9px 16px;gap:9px}.room-symbol{width:32px;height:32px}}
+.breadcrumb{font-size:13px}
+.secure-label{font-size:12px}
+.people-empty,.people-footer{font-size:13px}
