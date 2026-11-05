@@ -18,3 +18,12 @@
 .composer{min-height:43px}
 .composer-foot{padding-top:4px;padding-bottom:8px}
 @media(max-width:650px){.topbar{height:50px;flex-basis:50px;padding-inline:14px}.room-intro{min-height:54px;padding:7px 14px}.composer{min-height:43px}.composer-foot{padding-top:4px;padding-bottom:7px}}
+.topbar{height:44px;flex-basis:44px;padding-inline:24px}
+.room-intro{min-height:49px;padding:5px 24px;gap:8px}
+.room-symbol{width:29px;height:29px;font-size:16px}
+.room-kicker{margin-bottom:2px}
+.composer{min-height:38px}
+.composer input{padding-block:8px}
+.send-button{width:27px;height:27px}
+.composer-foot{padding-top:2px;padding-bottom:5px}
+@media(max-width:650px){.topbar{height:42px;flex-basis:42px;padding-inline:12px}.room-intro{min-height:46px;padding:5px 12px}.room-symbol{width:27px;height:27px}.composer{min-height:38px}.composer-foot{padding-top:2px;padding-bottom:4px}}
