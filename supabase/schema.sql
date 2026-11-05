@@ -24,6 +24,7 @@ create table if not exists public.messages (
   room_id uuid not null references public.rooms(id) on delete cascade,
   user_id uuid not null references auth.users(id) on delete cascade,
   author_name text not null,
+  author_avatar_url text,
   content text not null check (length(content) between 1 and 2000),
   created_at timestamptz not null default now()
 );
@@ -105,12 +106,13 @@ declare
   profile jsonb;
 begin
   select u.raw_user_meta_data into profile from auth.users u where u.id = new.user_id;
-  new.author_name := coalesce(profile ->> 'full_name', profile ->> 'name', split_part((select u.email from auth.users u where u.id = new.user_id), '@', 1), 'Someone');
+  new.author_name := coalesce(profile ->> 'username', profile ->> 'full_name', profile ->> 'name', split_part((select u.email from auth.users u where u.id = new.user_id), '@', 1), 'Someone');
+  new.author_avatar_url := nullif(profile ->> 'avatar_url', '');
   return new;
 end;
 $$;
 drop trigger if exists messages_set_author_name on public.messages;
-create trigger messages_set_author_name before insert or update of user_id, author_name on public.messages
+create trigger messages_set_author_name before insert or update of user_id, author_name, author_avatar_url on public.messages
 for each row execute function public.set_message_author_name();
 
 -- Room creators are members immediately, including when the room is private.

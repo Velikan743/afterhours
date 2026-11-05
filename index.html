@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="typography.css" />
     <link rel="stylesheet" href="room-discovery.css" />
+    <link rel="stylesheet" href="account-settings.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script defer src="app.js"></script>
@@ -77,11 +78,13 @@
 
         <div class="sidebar-bottom">
           <div class="sidebar-note"><span class="note-icon">✳</span><span>A little room to<br />be yourself.</span></div>
-          <button class="profile-button" id="profileButton">
+          <div class="profile-card">
             <span class="avatar avatar-small" id="profileAvatar">?</span>
             <span class="profile-copy"><strong id="profileName">Guest</strong><small id="profileStatus">Not signed in</small></span>
-            <span class="profile-menu">···</span>
-          </button>
+            <div class="profile-menu-wrap"><button class="profile-menu-button" id="profileMenuButton" type="button" aria-label="Open account menu" aria-haspopup="true" aria-expanded="false">···</button>
+              <div class="profile-popover hidden" id="profilePopover"><a href="settings.html">Account settings</a><button id="logoutButton" type="button">Log out</button></div>
+            </div>
+          </div>
         </div>
       </aside>
 

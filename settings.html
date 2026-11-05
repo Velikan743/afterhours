@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0f0e" />
+    <title>Account settings — afterhours</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="typography.css" />
+    <link rel="stylesheet" href="account-settings.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script defer src="settings.js"></script>
+  </head>
+  <body class="settings-body">
+    <main class="settings-shell">
+      <header class="settings-topbar"><a class="brand" href="./"><span class="brand-mark"><i></i><i></i><i></i></span><span>after<span class="brand-light">hours</span></span><span class="brand-dot"></span></a><a class="settings-back" href="./">← Back to rooms</a></header>
+      <section class="settings-content">
+        <div class="settings-heading"><span class="auth-eyebrow">YOUR ACCOUNT</span><h1>Account settings</h1><p>Keep your profile up to date and manage your sign-in details.</p></div>
+        <section class="settings-card">
+          <div class="settings-card-heading"><div><h2>Your profile</h2><p>This is how people see you in rooms.</p></div></div>
+          <form id="profileForm" class="settings-form">
+            <div class="avatar-editor"><span class="avatar settings-avatar" id="avatarPreview">?</span><div><label class="button button-quiet upload-button" for="avatarFile">Choose a profile picture</label><input class="visually-hidden" id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" /><p>PNG, JPG, WebP, or GIF. Up to 2 MB.</p></div></div>
+            <label for="settingsUsername">USERNAME</label><input class="auth-input" id="settingsUsername" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" autocomplete="nickname" required />
+            <label for="settingsMobile">MOBILE NUMBER</label><input class="auth-input" id="settingsMobile" type="tel" minlength="7" maxlength="24" autocomplete="tel" required />
+            <label for="settingsEmail">EMAIL ADDRESS</label><input class="auth-input" id="settingsEmail" type="email" disabled />
+            <p class="settings-feedback" id="profileFeedback" role="status" aria-live="polite"></p><button class="auth-submit" type="submit" id="profileSave">Save profile <span>↗</span></button>
+          </form>
+        </section>
+        <section class="settings-card">
+          <div class="settings-card-heading"><div><h2>Change password</h2><p>Confirm your current password before choosing a new one.</p></div></div>
+          <form id="passwordForm" class="settings-form">
+            <label for="currentPassword">CURRENT PASSWORD</label><input class="auth-input" id="currentPassword" type="password" autocomplete="current-password" required />
+            <label for="newPassword">NEW PASSWORD</label><input class="auth-input" id="newPassword" type="password" autocomplete="new-password" minlength="8" required />
+            <label for="confirmPassword">CONFIRM NEW PASSWORD</label><input class="auth-input" id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required />
+            <p class="settings-feedback" id="passwordFeedback" role="status" aria-live="polite"></p><button class="auth-submit" type="submit" id="passwordSave">Update password <span>↗</span></button>
+          </form>
+        </section>
+        <p class="settings-footer">Your account email can’t be changed here.</p>
+      </section>
+    </main>
+    <div class="toast" id="settingsToast" role="status" aria-live="polite"></div>
+  </body>
+</html>

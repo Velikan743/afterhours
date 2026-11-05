@@ -7,6 +7,7 @@
   let user = null, currentRoom = null, roomChannel = null, rooms = [], typingTimer = null, toastTimer = null, sentTyping = 0, currentDay = '';
   const initials = (name='?') => name.trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase() || '?';
   const displayName = (u) => u?.user_metadata?.username || u?.user_metadata?.full_name || u?.user_metadata?.name || u?.email?.split('@')[0] || 'Someone';
+  function setAvatar(node,name,url){node.replaceChildren();if(url){const img=document.createElement('img');img.src=url;img.alt=`${name}'s profile picture`;node.append(img)}else node.textContent=initials(name)}
   const notify = (message) => { ui.toast.textContent=message;ui.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>ui.toast.classList.remove('show'),2600); };
   const escapeRoomName = (name) => name.trim().toLowerCase().replace(/[^a-z0-9\s_-]/g,'').replace(/[\s_]+/g,'-').replace(/-+/g,'-').slice(0,32);
   let authView='login';
@@ -63,7 +64,7 @@
 
   function renderProfile(){
     $('profileName').textContent=user?displayName(user):'Guest';$('profileStatus').textContent=user?'Here for a good chat':'Not signed in';
-    const avatar=$('profileAvatar');avatar.textContent=initials(user?displayName(user):'?');avatar.style.background=user?'#d2e8a7':'#26312a';
+    const avatar=$('profileAvatar');avatar.style.background=user?'#d2e8a7':'#26312a';setAvatar(avatar,user?displayName(user):'?',user?.user_metadata?.avatar_url);
   }
   function renderRooms(){
     const query=$('roomSearch').value.trim().toLowerCase();
@@ -88,7 +89,7 @@
     if(ui.stream.querySelector(`[data-message-id="${CSS.escape(message.id)}"]`))return;
     const date=new Date(message.created_at),day=dateLabel(date);if(currentDay!==day){appendDivider(day);currentDay=day}
     const row=document.createElement('article');row.className='message'+(message.user_id===user?.id?' own':'');row.dataset.messageId=message.id;
-    const avatar=document.createElement('span');avatar.className='avatar message-avatar';avatar.textContent=initials(message.author_name||'Someone');
+    const avatar=document.createElement('span');avatar.className='avatar message-avatar';setAvatar(avatar,message.author_name||'Someone',message.author_avatar_url);
     const body=document.createElement('div');body.className='message-body';const meta=document.createElement('div');meta.className='message-meta';const name=document.createElement('strong');name.textContent=message.author_name||'Someone';const time=document.createElement('time');time.dateTime=date.toISOString();time.textContent=timeLabel(date);meta.append(name,time);
     const text=document.createElement('div');text.className='message-text';text.textContent=message.content;body.append(meta,text);
     if(message.user_id===user?.id){const actions=document.createElement('span');actions.className='message-actions';const edit=document.createElement('button');edit.type='button';edit.textContent='edit';edit.addEventListener('click',()=>editMessage(message));const del=document.createElement('button');del.type='button';del.textContent='delete';del.addEventListener('click',()=>deleteMessage(message.id));actions.append(edit,del);meta.append(actions)}
@@ -98,9 +99,9 @@
   async function deleteMessage(id){if(!confirm('Delete this message?'))return;const {error}=await db.from('messages').delete().eq('id',id).eq('user_id',user.id);if(error)notify(error.message);else{ui.stream.querySelector(`[data-message-id="${CSS.escape(id)}"]`)?.remove();notify('Message deleted.')}}
   function renderPeople(state){
     const peers=Object.values(state||{}).flat().filter(p=>p.user_id!==user?.id);ui.people.replaceChildren();ui.peopleCount.textContent=String(peers.length+(user?1:0));
-    const all=user?[{user_id:user.id,name:displayName(user)},...peers]:peers;
+    const all=user?[{user_id:user.id,name:displayName(user),avatar_url:user.user_metadata?.avatar_url},...peers]:peers;
     if(!all.length){const empty=document.createElement('div');empty.className='people-empty';empty.innerHTML='<span class="empty-orbit">◎</span><span>It\'s a little quiet<br />in here.</span>';ui.people.append(empty);ui.onlineLabel.textContent='Waiting for your people';return}
-    all.forEach((person,index)=>{const row=document.createElement('div');row.className='person-row';const a=document.createElement('span');a.className='avatar';a.textContent=initials(person.name);const n=document.createElement('span');n.className='person-name';n.textContent=(person.name||'Someone')+(person.user_id===user?.id?' (you)':'');const dot=document.createElement('i');dot.className='person-presence'+(index===0&&user?'':'');row.append(a,n,dot);ui.people.append(row)});
+    all.forEach((person,index)=>{const row=document.createElement('div');row.className='person-row';const a=document.createElement('span');a.className='avatar';setAvatar(a,person.name||'Someone',person.avatar_url);const n=document.createElement('span');n.className='person-name';n.textContent=(person.name||'Someone')+(person.user_id===user?.id?' (you)':'');const dot=document.createElement('i');dot.className='person-presence'+(index===0&&user?'':'');row.append(a,n,dot);ui.people.append(row)});
     ui.onlineLabel.textContent=all.length===1?'Just you, for now':`${all.length} people here now`;
   }
   function renderTyping(payloads){const active=Object.values(payloads||{}).flat().filter(p=>p.user_id!==user?.id&&p.typing);ui.typing.textContent=active.length?`${active.map(p=>p.name).slice(0,2).join(' and ')} ${active.length===1?'is':'are'} typing…`:''}
@@ -116,13 +117,16 @@
     roomChannel.on('postgres_changes',{event:'DELETE',schema:'public',table:'messages',filter:`room_id=eq.${room.id}`},payload=>ui.stream.querySelector(`[data-message-id="${CSS.escape(payload.old.id)}"]`)?.remove());
     roomChannel.on('broadcast',{event:'typing'},({payload})=>{clearTimeout(typingTimer);if(payload.typing){renderTyping({[payload.user_id]:[payload]});typingTimer=setTimeout(()=>ui.typing.textContent='',2200)}else ui.typing.textContent=''});
     roomChannel.on('presence',{event:'sync'},()=>renderPeople(roomChannel.presenceState()));
-    roomChannel.subscribe(async status=>{if(status==='SUBSCRIBED'){await roomChannel.track({user_id:user.id,name:displayName(user),online_at:new Date().toISOString()});renderPeople(roomChannel.presenceState())}else if(status==='CHANNEL_ERROR')notify('Live connection interrupted. Reconnecting…')});
+    roomChannel.subscribe(async status=>{if(status==='SUBSCRIBED'){await roomChannel.track({user_id:user.id,name:displayName(user),avatar_url:user.user_metadata?.avatar_url||null,online_at:new Date().toISOString()});renderPeople(roomChannel.presenceState())}else if(status==='CHANNEL_ERROR')notify('Live connection interrupted. Reconnecting…')});
     $('messageInput').focus();
   }
   async function loadRooms(){if(!db||!user){rooms=[];renderRooms();return}const params=new URLSearchParams(location.search);const invite=params.get('invite');if(invite){const {data,error}=await db.rpc('join_room_with_invite',{p_invite_code:invite});if(error||!data?.length){notify('That invite link is invalid or expired.');history.replaceState(null,'',location.pathname);params.delete('invite')}else{params.delete('invite');params.set('room',data[0].id);history.replaceState(null,'',`${location.pathname}?${params.toString()}`)}}const {data,error}=await db.from('rooms').select('id,name,description,created_at,is_private,invite_code').order('created_at',{ascending:true});if(error){notify(`Could not load rooms: ${error.message}`);return}rooms=data||[];renderRooms();const requested=new URLSearchParams(location.search).get('room');const room=rooms.find(r=>r.id===requested);if(room)await joinRoom(room);else{await leaveRoom();ui.currentRoomName.textContent='welcome';ui.chat.classList.add('hidden');ui.welcome.classList.remove('hidden')}}
   async function handleSession(session){user=session?.user||null;renderProfile();if(!user){document.body.classList.remove('authenticated');ui.authGate.classList.remove('hidden');await leaveRoom();rooms=[];renderRooms();ui.welcome.classList.remove('hidden');ui.chat.classList.add('hidden');return}document.body.classList.add('authenticated');ui.authGate.classList.add('hidden');await loadRooms()}
 
-  $('newRoomButton').addEventListener('click',openCreate);$('welcomeCreateButton').addEventListener('click',openCreate);$('profileButton').addEventListener('click',()=>user?db.auth.signOut():showAuth('login'));
+  $('newRoomButton').addEventListener('click',openCreate);$('welcomeCreateButton').addEventListener('click',openCreate);
+  $('profileMenuButton').addEventListener('click',event=>{event.stopPropagation();const popover=$('profilePopover');const opening=popover.classList.contains('hidden');popover.classList.toggle('hidden',!opening);$('profileMenuButton').setAttribute('aria-expanded',String(opening))});
+  $('logoutButton').addEventListener('click',async()=>{ $('profilePopover').classList.add('hidden');$('profileMenuButton').setAttribute('aria-expanded','false');const {error}=await db.auth.signOut();if(error)notify(error.message)});
+  document.addEventListener('click',event=>{if(!event.target.closest('.profile-menu-wrap')){$('profilePopover').classList.add('hidden');$('profileMenuButton').setAttribute('aria-expanded','false')}});
   $('homeButton').addEventListener('click',async()=>{await leaveRoom();history.replaceState(null,'',location.pathname);ui.currentRoomName.textContent='welcome';ui.chat.classList.add('hidden');ui.welcome.classList.remove('hidden');renderRooms()});
   document.querySelectorAll('[data-show-view]').forEach(button=>button.addEventListener('click',()=>showAuth(button.dataset.showView)));
   $('loginForm').addEventListener('submit',submitLogin);$('signupForm').addEventListener('submit',submitSignup);$('forgotForm').addEventListener('submit',submitForgot);$('loginEmail').addEventListener('input',updateLoginLimit);
