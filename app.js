@@ -137,7 +137,11 @@
     const visibility=document.querySelector('input[name="roomVisibility"]:checked')?.value||'public';
     const button=$('createRoomSubmit');button.disabled=true;button.firstChild.textContent='Creating…';
     try{
-      const {data,error}=await db.from('rooms').insert({name,description,created_by:user.id,is_private:visibility==='private'}).select().single();
+      const {error:insertError}=await db.from('rooms').insert({name,description,created_by:user.id,is_private:visibility==='private'});
+      if(insertError){setFeedback('createRoomFeedback',insertError.message.includes('duplicate')?'That room name is already taken.':`Could not create room: ${insertError.message}`);return}
+      // Read in a separate request so the creator-membership trigger has committed
+      // before the private-room SELECT policy is evaluated.
+      const {data,error}=await db.from('rooms').select('id,name,description,created_at,is_private,invite_code').eq('name',name).eq('created_by',user.id).single();
       if(error){setFeedback('createRoomFeedback',error.message.includes('duplicate')?'That room name is already taken.':`Could not create room: ${error.message}`);return}
       rooms.push(data);ui.createModal.close();e.target.reset();renderRooms();await joinRoom(data);notify(data.is_private?'Private room ready. Share its invite link.':'Public room ready to discover.');
     }catch(error){setFeedback('createRoomFeedback',`Could not create room: ${error.message||'Please try again.'}`)}
