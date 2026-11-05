@@ -20,6 +20,14 @@ create table if not exists public.room_members (
   primary key (room_id, user_id)
 );
 
+create table if not exists public.room_read_states (
+  room_id uuid not null references public.rooms(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  last_read_at timestamptz not null,
+  updated_at timestamptz not null default now(),
+  primary key (room_id,user_id)
+);
+
 create table if not exists public.room_assets (
   id uuid primary key default gen_random_uuid(),
   room_id uuid not null references public.rooms(id) on delete cascade,
@@ -49,16 +57,18 @@ create index if not exists messages_room_created_idx on public.messages(room_id,
 
 alter table public.rooms enable row level security;
 alter table public.room_members enable row level security;
+alter table public.room_read_states enable row level security;
 alter table public.room_assets enable row level security;
 alter table public.messages enable row level security;
 
 -- Keep API table access explicit. This also works when the project is created
 -- with "Automatically expose new tables" disabled.
 grant usage on schema public to authenticated;
-revoke all on table public.rooms, public.room_members, public.room_assets, public.messages from anon, authenticated;
+revoke all on table public.rooms, public.room_members, public.room_read_states, public.room_assets, public.messages from anon, authenticated;
 grant select on table public.rooms to authenticated;
 grant insert (name, description, created_by, is_private) on table public.rooms to authenticated;
 grant select, insert on table public.room_members to authenticated;
+grant select, insert, update on table public.room_read_states to authenticated;
 grant select, insert, update, delete on table public.messages to authenticated;
 
 -- SECURITY DEFINER helpers avoid recursive room <-> membership RLS checks.
@@ -92,6 +102,16 @@ drop policy if exists "Users can join public rooms as themselves" on public.room
 create policy "Users can join public rooms as themselves" on public.room_members for insert to authenticated with check (
   user_id = (select auth.uid()) and public.is_public_room(room_id)
 );
+drop policy if exists "Users can read their room read positions" on public.room_read_states;
+create policy "Users can read their room read positions" on public.room_read_states for select to authenticated
+using (user_id=(select auth.uid()) and public.is_current_user_room_member(room_id));
+drop policy if exists "Users can create their room read positions" on public.room_read_states;
+create policy "Users can create their room read positions" on public.room_read_states for insert to authenticated
+with check (user_id=(select auth.uid()) and public.is_current_user_room_member(room_id));
+drop policy if exists "Users can update their room read positions" on public.room_read_states;
+create policy "Users can update their room read positions" on public.room_read_states for update to authenticated
+using (user_id=(select auth.uid()) and public.is_current_user_room_member(room_id))
+with check (user_id=(select auth.uid()) and public.is_current_user_room_member(room_id));
 drop policy if exists "Room members can read messages" on public.messages;
 create policy "Room members can read messages" on public.messages for select to authenticated using (
   exists (select 1 from public.room_members rm where rm.room_id = messages.room_id and rm.user_id = (select auth.uid()))
