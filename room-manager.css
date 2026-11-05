@@ -12,3 +12,9 @@
 .breadcrumb{font-size:13px}
 .secure-label{font-size:12px}
 .people-empty,.people-footer{font-size:13px}
+.topbar{height:54px;flex-basis:54px;padding-inline:28px}
+.room-intro{min-height:58px;padding:8px 28px;gap:10px}
+.room-symbol{width:32px;height:32px;border-radius:8px}
+.composer{min-height:43px}
+.composer-foot{padding-top:4px;padding-bottom:8px}
+@media(max-width:650px){.topbar{height:50px;flex-basis:50px;padding-inline:14px}.room-intro{min-height:54px;padding:7px 14px}.composer{min-height:43px}.composer-foot{padding-top:4px;padding-bottom:7px}}
