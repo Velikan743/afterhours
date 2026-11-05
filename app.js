@@ -158,10 +158,12 @@
   async function handleSession(session){user=session?.user||null;renderProfile();if(!user){document.body.classList.remove('authenticated');ui.authGate.classList.remove('hidden');await leaveRoom();rooms=[];renderRooms();ui.welcome.classList.remove('hidden');ui.chat.classList.add('hidden');return}document.body.classList.add('authenticated');ui.authGate.classList.add('hidden');await loadRooms()}
 
   $('newRoomButton').addEventListener('click',openCreate);$('welcomeCreateButton').addEventListener('click',openCreate);
+  async function goHome(){await leaveRoom();history.replaceState(null,'',location.pathname);ui.currentRoomName.textContent='welcome';ui.chat.classList.add('hidden');ui.welcome.classList.remove('hidden');renderRooms()}
+  $('homeBrand').addEventListener('click',event=>{event.preventDefault();$('sidebar').classList.remove('open');goHome()});
   $('profileMenuButton').addEventListener('click',event=>{event.stopPropagation();const popover=$('profilePopover');const opening=popover.classList.contains('hidden');popover.classList.toggle('hidden',!opening);$('profileMenuButton').setAttribute('aria-expanded',String(opening))});
   $('logoutButton').addEventListener('click',async()=>{ $('profilePopover').classList.add('hidden');$('profileMenuButton').setAttribute('aria-expanded','false');const {error}=await db.auth.signOut();if(error)notify(error.message)});
   document.addEventListener('click',event=>{if(!event.target.closest('.profile-menu-wrap')){$('profilePopover').classList.add('hidden');$('profileMenuButton').setAttribute('aria-expanded','false')}});
-  $('homeButton').addEventListener('click',async()=>{await leaveRoom();history.replaceState(null,'',location.pathname);ui.currentRoomName.textContent='welcome';ui.chat.classList.add('hidden');ui.welcome.classList.remove('hidden');renderRooms()});
+  $('homeButton').addEventListener('click',goHome);
   document.querySelectorAll('[data-show-view]').forEach(button=>button.addEventListener('click',()=>showAuth(button.dataset.showView)));
   $('loginForm').addEventListener('submit',submitLogin);$('signupForm').addEventListener('submit',submitSignup);$('forgotForm').addEventListener('submit',submitForgot);$('loginEmail').addEventListener('input',updateLoginLimit);
   document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>$(b.dataset.close).close()));
