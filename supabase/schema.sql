@@ -8,6 +8,7 @@ create table if not exists public.rooms (
   created_by uuid not null references auth.users(id) on delete cascade,
   is_private boolean not null default false,
   invite_code text not null default replace(gen_random_uuid()::text, '-', ''),
+  theme_id text not null default 'midnight' check (theme_id in ('midnight','ocean','moss','lavender','sunset','rose','amber','forest','plum','mono')),
   created_at timestamptz not null default now()
 );
 create unique index if not exists rooms_invite_code_key on public.rooms(invite_code);
@@ -19,26 +20,42 @@ create table if not exists public.room_members (
   primary key (room_id, user_id)
 );
 
+create table if not exists public.room_assets (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid not null references public.rooms(id) on delete cascade,
+  kind text not null check (kind in ('emoji','sticker')),
+  name text not null check (name ~ '^[a-z0-9_-]{1,24}$'),
+  object_path text not null unique,
+  created_by uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (room_id,kind,name)
+);
+create index if not exists room_assets_room_kind_idx on public.room_assets(room_id,kind,created_at);
+
 create table if not exists public.messages (
   id uuid primary key default gen_random_uuid(),
   room_id uuid not null references public.rooms(id) on delete cascade,
   user_id uuid not null references auth.users(id) on delete cascade,
   author_name text not null,
   author_avatar_url text,
+  message_type text not null default 'text',
+  asset_id uuid references public.room_assets(id) on delete set null,
   content text not null check (length(content) between 1 and 2000),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint messages_type_asset_check check ((message_type='text' and asset_id is null) or message_type='sticker')
 );
 
 create index if not exists messages_room_created_idx on public.messages(room_id, created_at);
 
 alter table public.rooms enable row level security;
 alter table public.room_members enable row level security;
+alter table public.room_assets enable row level security;
 alter table public.messages enable row level security;
 
 -- Keep API table access explicit. This also works when the project is created
 -- with "Automatically expose new tables" disabled.
 grant usage on schema public to authenticated;
-revoke all on table public.rooms, public.room_members, public.messages from anon, authenticated;
+revoke all on table public.rooms, public.room_members, public.room_assets, public.messages from anon, authenticated;
 grant select on table public.rooms to authenticated;
 grant insert (name, description, created_by, is_private) on table public.rooms to authenticated;
 grant select, insert on table public.room_members to authenticated;
