@@ -16,7 +16,7 @@ flowchart LR
 ## Run locally
 
 1. Create a Supabase project on the free tier.
-2. Open **SQL Editor** in Supabase and run [`supabase/schema.sql`](supabase/schema.sql).
+2. Open **SQL Editor** in Supabase and run [`supabase/schema.sql`](supabase/schema.sql). If the original schema is already installed, run [`supabase/rooms-privacy-migration.sql`](supabase/rooms-privacy-migration.sql) instead before deploying the updated frontend. Existing rooms remain public.
 3. Under **Authentication → Providers → Email**, keep email/password sign-in enabled. Leave email confirmation enabled so new accounts verify their address.
 4. Under **Authentication → URL Configuration**, set the Site URL to your local origin. Add these URLs to the redirect allow list: `http://localhost:4173/**`, `http://localhost:4173/reset-password.html`, `https://your-site.vercel.app/**`, and `https://your-site.vercel.app/reset-password.html` (replace the example domain after deployment).
 5. Copy the Project URL and publishable key (or legacy anon key) from **Project Settings → API Keys** into [`config.js`](config.js). These keys are intended for browser use; never put a secret or service-role key here.
@@ -26,7 +26,7 @@ flowchart LR
    python -m http.server 4173
    ```
 
-7. Open `http://localhost:4173`, create an account with your email, mobile number, username, and password, and confirm the address from your email. Sign in and create a room. Open the site in a second browser window with another account to try live chat.
+7. Open `http://localhost:4173`, create an account with your email, mobile number, username, and password, and confirm the address from your email. The home page lists public rooms and lets you search by name. Create either a public room or a private room; private rooms are hidden from discovery and can only be joined from their invite link. Open the site in a second browser window with another account to try live chat.
 
 The mobile number and username are stored as Supabase Auth user metadata. The mobile number is collected but not SMS-verified. The login screen locks that email after five incorrect-password responses in the current browser and offers password reset. This browser-side counter is a usability guard, not a security boundary: clearing browser storage or using another browser bypasses it. For a strict cross-device five-attempt lockout, add a server-side rate limiter, such as a Supabase Edge Function, in front of password sign-in.
 
@@ -41,7 +41,7 @@ Password recovery uses Supabase Auth email delivery and returns to `reset-passwo
 
 ## What is protected
 
-- Rooms and messages are only available to signed-in users. Users join a room before reading or posting there.
+- Public rooms are discoverable by signed-in users. Private rooms are visible only to members; a private invite link grants membership through a restricted database function. Users join a room before reading or posting there.
 - Row Level Security requires every new message's `user_id` to match the authenticated user. A database trigger sets the displayed name from that user's account profile.
 - Updates and deletes are limited to the message author. The UI only offers edit and delete on your own messages; the policies enforce the same rule for direct API calls.
 - Message inserts/updates/deletes use Postgres Changes. Typing indicators use Realtime Broadcast, and the people list uses Realtime Presence.
