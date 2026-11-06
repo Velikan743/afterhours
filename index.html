@@ -130,8 +130,10 @@
 
       <button type="button" class="mobile-drawer-backdrop hidden" id="mobileDrawerBackdrop" aria-label="Close navigation panel"></button>
       <aside class="people-panel" id="peoplePanel" aria-label="Room members">
-        <div class="people-header"><div><span class="panel-kicker">IN THE ROOM</span><h2>People <span class="people-count" id="peopleCount">0</span></h2></div><button class="icon-button mobile-panel-close" id="closePeoplePanel" type="button" aria-label="Close room members">×</button><button class="icon-button" id="peopleInfo" type="button" title="People currently in this room" aria-label="People currently in this room">···</button></div>
+        <div class="people-header"><div><span class="panel-kicker" id="peoplePanelKicker">IN THE ROOM</span><h2><span id="peopleHeading">People</span> <span class="people-count" id="peopleCount">0</span></h2></div><button class="icon-button mobile-panel-close" id="closePeoplePanel" type="button" aria-label="Close room members">×</button><button class="icon-button" id="peopleInfo" type="button" title="People currently in this room" aria-label="People currently in this room">···</button></div>
         <div class="people-list" id="peopleList"><div class="people-empty"><span class="empty-orbit">◎</span><span>It's a little quiet<br />in here.</span></div></div>
+        <button class="room-reports-toggle hidden" id="roomReportsToggle" type="button"><span>Review reports</span><span aria-hidden="true">↗</span></button>
+        <section class="room-reports-panel hidden" id="roomReportsPanel" aria-label="Room reports"><div class="room-reports-toolbar"><button type="button" id="backToPeople">← People</button><span id="roomReportCount"></span></div><div class="room-reports-list" id="roomReportsList"></div></section>
         <div class="people-footer"><span class="online-indicator"></span><span id="onlineLabel">Waiting for your people</span></div>
       </aside>
     </div>
