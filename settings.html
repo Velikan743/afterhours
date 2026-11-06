@@ -23,6 +23,15 @@
       <section class="settings-content">
         <div class="settings-heading"><span class="auth-eyebrow">YOUR ACCOUNT</span><h1>Account settings</h1><p>Keep your profile up to date and manage your sign-in details.</p></div>
         <section class="settings-card">
+          <div class="settings-card-heading"><div><h2>Message notifications</h2><p>Choose whether the browser should alert you for room messages.</p></div></div>
+          <form id="notificationForm" class="settings-form">
+            <label for="notificationPreference">NOTIFY ME ABOUT</label>
+            <select class="auth-input" id="notificationPreference"><option value="mentions">Mentions only</option><option value="all">All new messages</option><option value="off">Off</option></select>
+            <div class="notification-permission-row"><div><strong id="notificationPermissionStatus">Checking browser permission…</strong><p>Browser permission is saved for this device. Message preference is saved to your account.</p></div><button class="button button-quiet" id="enableBrowserNotifications" type="button">Enable on this device</button></div>
+            <p class="settings-feedback" id="notificationFeedback" role="status" aria-live="polite"></p><button class="auth-submit" type="submit" id="notificationSave">Save notification settings <span>↗</span></button>
+          </form>
+        </section>
+        <section class="settings-card">
           <div class="settings-card-heading"><div><h2>Your profile</h2><p>This is how people see you in rooms.</p></div></div>
           <form id="profileForm" class="settings-form">
             <div class="avatar-editor"><span class="avatar settings-avatar" id="avatarPreview">?</span><div><label class="button button-quiet upload-button" for="avatarFile">Choose a profile picture</label><input class="visually-hidden" id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" /><p>PNG, JPG, WebP, or GIF. Up to 2 MB.</p></div></div>
