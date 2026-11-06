@@ -21,6 +21,7 @@
     <script defer src="app.js"></script>
   </head>
   <body>
+    <a class="skip-link" href="#conversation">Skip to main content</a>
     <section class="auth-gate" id="authGate">
       <div class="auth-story">
         <a class="brand auth-brand" href="#" aria-label="afterhours home"><span class="brand-mark"><i></i><i></i><i></i></span><span>after<span class="brand-light">hours</span></span><span class="brand-dot"></span></a>
@@ -93,12 +94,12 @@
 
       <main class="main-panel">
         <header class="topbar">
-          <button class="icon-button mobile-menu" id="mobileMenu" aria-label="Open rooms">☰</button>
+          <button class="icon-button mobile-menu" id="mobileMenu" aria-label="Open rooms" aria-controls="sidebar" aria-expanded="false">☰</button>
           <div class="breadcrumb"><button class="crumb-home" id="homeButton" type="button" title="Back to room discovery">spaces</button><span class="crumb-slash">/</span><strong id="currentRoomName">welcome</strong></div>
-          <div class="topbar-right"><span class="secure-label"><span class="secure-dot"></span> private by design</span><div class="room-search-wrap hidden" id="roomSearchWrap"><input id="roomMessageSearch" type="search" maxlength="80" placeholder="Search this room" aria-label="Search messages in this room" autocomplete="off" /><button type="button" id="closeRoomMessageSearch" aria-label="Close room search">×</button><div class="room-search-results hidden" id="roomSearchResults" role="listbox" aria-label="Room message search results"></div></div><button class="icon-button hidden" id="searchRoomButton" title="Search messages in this room" aria-label="Search messages in this room">⌕</button><button class="icon-button hidden" id="manageRoomButton" title="Manage this room" aria-label="Manage this room">⚙</button><button class="icon-button" id="inviteButton" title="Copy room link" aria-label="Copy room link">↗</button></div>
+          <div class="topbar-right"><span class="secure-label"><span class="secure-dot"></span> private by design</span><div class="room-search-wrap hidden" id="roomSearchWrap"><input id="roomMessageSearch" type="search" maxlength="80" placeholder="Search this room" aria-label="Search messages in this room" autocomplete="off" /><button type="button" id="closeRoomMessageSearch" aria-label="Close room search">×</button><div class="room-search-results hidden" id="roomSearchResults" role="listbox" aria-label="Room message search results"></div></div><button class="icon-button hidden" id="searchRoomButton" title="Search messages in this room" aria-label="Search messages in this room">⌕</button><button class="icon-button hidden" id="manageRoomButton" title="Manage this room" aria-label="Manage this room">⚙</button><button class="icon-button hidden mobile-people-button" id="mobilePeopleButton" type="button" aria-label="Show room members" aria-controls="peoplePanel" aria-expanded="false">☷</button><button class="icon-button" id="inviteButton" title="Copy room link" aria-label="Copy room link">↗</button></div>
         </header>
 
-        <section class="conversation" id="conversation">
+        <section class="conversation" id="conversation" tabindex="-1" aria-label="Main conversation">
           <div class="welcome-state" id="welcomeState">
             <section class="welcome-hero">
               <div class="welcome-eyebrow"><span class="eyebrow-line"></span> A QUIET CORNER OF THE INTERNET</div>
@@ -117,7 +118,7 @@
           <div class="chat-view hidden" id="chatView">
             <div class="room-intro"><div class="room-symbol" id="roomSymbol">#</div><div><div class="room-kicker">YOU'RE IN</div><h1 id="roomHeading">the room</h1></div><span class="room-privacy-pill" id="roomPrivacyPill">PUBLIC</span><span class="room-intro-line"></span><span class="room-description" id="roomDescription">A place to talk.</span></div>
             <div class="search-context-banner hidden" id="searchContextBanner"><span id="searchContextLabel">Showing a search result from this room.</span><button type="button" id="returnToLatest">Return to latest</button></div>
-            <div class="message-stream" id="messageStream" aria-live="polite"></div>
+            <div class="message-stream" id="messageStream" role="log" aria-label="Room messages" aria-live="polite" aria-relevant="additions text" aria-atomic="false"></div>
             <div class="typing-line" id="typingLine"></div>
             <div class="asset-picker hidden" id="assetPicker"><div class="asset-picker-heading"><strong>Room emoji</strong><span id="emojiSlotHint">0 / 50</span></div><div class="asset-picker-grid" id="emojiPickerGrid"></div><div class="asset-picker-heading sticker-picker-heading"><strong>Stickers</strong><span id="stickerSlotHint">0 / 10</span></div><div class="sticker-picker-grid" id="stickerPickerGrid"></div></div>
             <div class="replying-banner hidden" id="replyingBanner"><span id="replyingLabel"></span><button type="button" id="cancelReply" aria-label="Cancel reply">×</button></div>
@@ -127,8 +128,9 @@
         </section>
       </main>
 
-      <aside class="people-panel">
-        <div class="people-header"><div><span class="panel-kicker">IN THE ROOM</span><h2>People <span class="people-count" id="peopleCount">0</span></h2></div><button class="icon-button" id="peopleInfo" title="People currently in this room">···</button></div>
+      <button type="button" class="mobile-drawer-backdrop hidden" id="mobileDrawerBackdrop" aria-label="Close navigation panel"></button>
+      <aside class="people-panel" id="peoplePanel" aria-label="Room members">
+        <div class="people-header"><div><span class="panel-kicker">IN THE ROOM</span><h2>People <span class="people-count" id="peopleCount">0</span></h2></div><button class="icon-button mobile-panel-close" id="closePeoplePanel" type="button" aria-label="Close room members">×</button><button class="icon-button" id="peopleInfo" type="button" title="People currently in this room" aria-label="People currently in this room">···</button></div>
         <div class="people-list" id="peopleList"><div class="people-empty"><span class="empty-orbit">◎</span><span>It's a little quiet<br />in here.</span></div></div>
         <div class="people-footer"><span class="online-indicator"></span><span id="onlineLabel">Waiting for your people</span></div>
       </aside>
