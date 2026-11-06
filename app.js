@@ -127,14 +127,19 @@
   function receiveMessage(message){const following=atMessageBottom()&&!document.hidden&&document.hasFocus(),incoming=message.user_id!==user?.id;if(incoming&&!following&&!unreadMessageId)unreadMessageId=message.id;appendMessage(message);if(!lastMessageAt||new Date(message.created_at)>new Date(lastMessageAt))lastMessageAt=message.created_at;if(following){clearUnreadMarker();ui.stream.scrollTop=ui.stream.scrollHeight;queueReadPosition()}}
   async function editMessage(message){const next=prompt('Edit your message',message.content);if(next===null||!next.trim()||next.trim()===message.content)return;const {error}=await db.from('messages').update({content:next.trim()}).eq('id',message.id).eq('user_id',user.id);if(error)notify(error.message);else{const text=ui.stream.querySelector(`[data-message-id="${CSS.escape(message.id)}"] .message-text`);if(text)renderMessageContent(text,next.trim());notify('Message updated.')}}
   async function deleteMessage(id){if(!confirm('Delete this message?'))return;const {error}=await db.from('messages').delete().eq('id',id).eq('user_id',user.id);if(error)notify(error.message);else{ui.stream.querySelector(`[data-message-id="${CSS.escape(id)}"]`)?.remove();notify('Message deleted.')}}
-  let locallyRemovedMembers=new Set();
+  let roomMemberRoster=[];
+  async function loadRoomMembers(roomId){
+    const {data,error}=await db.rpc('get_room_members',{p_room_id:roomId});
+    if(error){notify(`Could not load room members: ${error.message}`);return}
+    if(currentRoom?.id===roomId){roomMemberRoster=data||[];renderPeople(roomChannel?.presenceState())}
+  }
   async function removeRoomMember(person){
     if(!currentRoom||currentRoom.created_by!==user?.id||!person?.user_id||person.user_id===user.id)return;
     if(!confirm(`Remove ${person.name||'this person'} from this room?`))return;
     const roomId=currentRoom.id, removedId=person.user_id;
     const {data,error}=await db.rpc('remove_room_member',{p_room_id:roomId,p_user_id:removedId});
     if(error||!data){notify(`Could not remove member: ${error?.message||'They may have already left the room.'}`);return}
-    locallyRemovedMembers.add(removedId);renderPeople(roomChannel?.presenceState());
+    roomMemberRoster=roomMemberRoster.filter(member=>member.user_id!==removedId);renderPeople(roomChannel?.presenceState());
     roomChannel?.send({type:'broadcast',event:'member_removed',payload:{user_id:removedId}});
     notify(`${person.name||'Member'} was removed from the room.`);
   }
@@ -147,18 +152,20 @@
     await loadRooms();notify('The room owner removed you from this room.');
   }
   function renderPeople(state){
-    const peers=Object.values(state||{}).flat().filter(p=>p.user_id!==user?.id&&!locallyRemovedMembers.has(p.user_id));ui.people.replaceChildren();ui.peopleCount.textContent=String(peers.length+(user?1:0));
-    const all=user?[{user_id:user.id,name:displayName(user),avatar_url:user.user_metadata?.avatar_url},...peers]:peers;
+    const presence=Object.values(state||{}).flat(),onlineById=new Map();presence.forEach(person=>{if(person.user_id&&!onlineById.has(person.user_id))onlineById.set(person.user_id,person)});
+    const all=roomMemberRoster.map(member=>{const online=onlineById.get(member.user_id);return {...member,name:online?.name||member.display_name||'Someone',avatar_url:online?.avatar_url||member.avatar_url||'',is_online:!!online}});
+    ui.people.replaceChildren();ui.peopleCount.textContent=String(all.length);
     if(!all.length){const empty=document.createElement('div');empty.className='people-empty';empty.innerHTML='<span class="empty-orbit">◎</span><span>It\'s a little quiet<br />in here.</span>';ui.people.append(empty);ui.onlineLabel.textContent='Waiting for your people';return}
-    all.forEach((person,index)=>{const row=document.createElement('div');row.className='person-row';const a=document.createElement('span');a.className='avatar';setAvatar(a,person.name||'Someone',person.avatar_url);const n=document.createElement('span');n.className='person-name';n.textContent=(person.name||'Someone')+(person.user_id===user?.id?' (you)':'')+(person.user_id===currentRoom?.created_by?' · owner':'');const dot=document.createElement('i');dot.className='person-presence'+(index===0&&user?'':'');row.append(a,n,dot);if(currentRoom?.created_by===user?.id&&person.user_id!==currentRoom.created_by&&person.user_id!==user.id){const remove=document.createElement('button');remove.type='button';remove.className='person-remove';remove.textContent='×';remove.title=`Remove ${person.name||'member'} from this room`;remove.setAttribute('aria-label',remove.title);remove.addEventListener('click',()=>removeRoomMember(person));row.append(remove)}ui.people.append(row)});
-    ui.onlineLabel.textContent=all.length===1?'Just you, for now':`${all.length} people here now`;
+    all.forEach(person=>{const row=document.createElement('div');row.className='person-row';const a=document.createElement('span');a.className='avatar';setAvatar(a,person.name||'Someone',person.avatar_url);const n=document.createElement('span');n.className='person-name';n.textContent=(person.name||'Someone')+(person.user_id===user?.id?' (you)':'')+(person.user_id===currentRoom?.created_by?' · owner':'');const dot=document.createElement('i');dot.className='person-presence'+(person.is_online?'':' away');dot.title=person.is_online?'Online':'Offline';row.append(a,n,dot);if(currentRoom?.created_by===user?.id&&person.user_id!==currentRoom.created_by&&person.user_id!==user.id){const remove=document.createElement('button');remove.type='button';remove.className='person-remove';remove.textContent='×';remove.title=`Remove ${person.name||'member'} from this room`;remove.setAttribute('aria-label',remove.title);remove.addEventListener('click',()=>removeRoomMember(person));row.append(remove)}ui.people.append(row)});
+    const onlineCount=all.filter(person=>person.is_online).length,offlineCount=all.length-onlineCount;ui.onlineLabel.textContent=offlineCount?`${onlineCount} online · ${offlineCount} offline`:onlineCount===1?'Just you, for now':`${onlineCount} people here now`;
   }
   function renderTyping(payloads){const active=Object.values(payloads||{}).flat().filter(p=>p.user_id!==user?.id&&p.typing);ui.typing.textContent=active.length?`${active.map(p=>p.name).slice(0,2).join(' and ')} ${active.length===1?'is':'are'} typing…`:''}
-  async function leaveRoom(){if(readSaveTimer){clearTimeout(readSaveTimer);readSaveTimer=null;if(currentRoom&&lastMessageAt&&atMessageBottom())await saveReadPosition(lastMessageAt)}if(roomChannel){await db.removeChannel(roomChannel);roomChannel=null}currentRoom=null;unreadMessageId=null;lastMessageAt='';lastReadAt=''}
+  async function leaveRoom(){if(readSaveTimer){clearTimeout(readSaveTimer);readSaveTimer=null;if(currentRoom&&lastMessageAt&&atMessageBottom())await saveReadPosition(lastMessageAt)}if(roomChannel){await db.removeChannel(roomChannel);roomChannel=null}currentRoom=null;roomMemberRoster=[];unreadMessageId=null;lastMessageAt='';lastReadAt=''}
   async function joinRoom(room){
     if(!user){showAuth('login');notify('Sign in to join the conversation.');return}
-    if(currentRoom?.id===room.id)return;await leaveRoom();locallyRemovedMembers=new Set();roomAssets=[];setRoomHeader(room);ui.stream.replaceChildren();currentDay='';ui.typing.textContent='';
+    if(currentRoom?.id===room.id)return;await leaveRoom();roomAssets=[];setRoomHeader(room);ui.stream.replaceChildren();currentDay='';ui.typing.textContent='';
     if(!room.is_private){const {error:joinError}=await db.from('room_members').upsert({room_id:room.id,user_id:user.id},{onConflict:'room_id,user_id',ignoreDuplicates:true});if(joinError){notify(joinError.message);return}}
+    await loadRoomMembers(room.id);
     await loadRoomAssets(room.id);await applyCustomRoomBackground(room);
     const {data:readState,error:readError}=await db.from('room_read_states').select('last_read_at').eq('room_id',room.id).eq('user_id',user.id).maybeSingle();if(readError)notify(`Could not load read position: ${readError.message}`);lastReadAt=readState?.last_read_at||'';
     const recentQuery=db.from('messages').select('*').eq('room_id',room.id).order('created_at',{ascending:true}).limit(100);
@@ -174,8 +181,8 @@
     roomChannel.on('postgres_changes',{event:'UPDATE',schema:'public',table:'rooms',filter:`id=eq.${room.id}`},payload=>{if(currentRoom?.id!==payload.new.id)return;const logoChanged=currentRoom.logo_path!==payload.new.logo_path;currentRoom.theme_id=payload.new.theme_id;currentRoom.custom_background_path=payload.new.custom_background_path;currentRoom.logo_path=payload.new.logo_path;ui.chat.dataset.theme=payload.new.theme_id;const known=rooms.find(r=>r.id===payload.new.id);if(known){known.theme_id=payload.new.theme_id;known.custom_background_path=payload.new.custom_background_path;known.logo_path=payload.new.logo_path}if(logoChanged)refreshRoomLogo(payload.new.id,payload.new.logo_path);applyCustomRoomBackground(currentRoom)});
     roomChannel.on('postgres_changes',{event:'*',schema:'public',table:'room_assets',filter:`room_id=eq.${room.id}`},()=>{if(currentRoom?.id===room.id)loadRoomAssets(room.id)});
     roomChannel.on('broadcast',{event:'typing'},({payload})=>{clearTimeout(typingTimer);if(payload.typing){renderTyping({[payload.user_id]:[payload]});typingTimer=setTimeout(()=>ui.typing.textContent='',2200)}else ui.typing.textContent=''});
-    roomChannel.on('broadcast',{event:'member_removed'},({payload})=>handleRoomRemoval(payload,room.id));
-    roomChannel.on('presence',{event:'sync'},()=>renderPeople(roomChannel.presenceState()));
+    roomChannel.on('presence',{event:'sync'},()=>{renderPeople(roomChannel.presenceState());loadRoomMembers(room.id)});
+    roomChannel.on('broadcast',{event:'member_removed'},({payload})=>{if(payload?.user_id===user.id)handleRoomRemoval(payload,room.id);else loadRoomMembers(room.id)});
     roomChannel.subscribe(async status=>{if(status==='SUBSCRIBED'){await roomChannel.track({user_id:user.id,name:displayName(user),avatar_url:user.user_metadata?.avatar_url||null,online_at:new Date().toISOString()});renderPeople(roomChannel.presenceState());const {data:missed}=await db.from('messages').select('*').eq('room_id',room.id).gt('created_at',lastReadAt||'1970-01-01T00:00:00.000Z').order('created_at',{ascending:true}).limit(500);(missed||[]).forEach(receiveMessage)}else if(status==='CHANNEL_ERROR')notify('Live connection interrupted. Reconnecting…')});
     $('messageInput').focus();
   }
