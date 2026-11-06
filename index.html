@@ -95,7 +95,7 @@
         <header class="topbar">
           <button class="icon-button mobile-menu" id="mobileMenu" aria-label="Open rooms">☰</button>
           <div class="breadcrumb"><button class="crumb-home" id="homeButton" type="button" title="Back to room discovery">spaces</button><span class="crumb-slash">/</span><strong id="currentRoomName">welcome</strong></div>
-          <div class="topbar-right"><span class="secure-label"><span class="secure-dot"></span> private by design</span><button class="icon-button hidden" id="manageRoomButton" title="Manage this room" aria-label="Manage this room">⚙</button><button class="icon-button" id="inviteButton" title="Copy room link" aria-label="Copy room link">↗</button></div>
+          <div class="topbar-right"><span class="secure-label"><span class="secure-dot"></span> private by design</span><div class="room-search-wrap hidden" id="roomSearchWrap"><input id="roomMessageSearch" type="search" maxlength="80" placeholder="Search this room" aria-label="Search messages in this room" autocomplete="off" /><button type="button" id="closeRoomMessageSearch" aria-label="Close room search">×</button><div class="room-search-results hidden" id="roomSearchResults" role="listbox" aria-label="Room message search results"></div></div><button class="icon-button hidden" id="searchRoomButton" title="Search messages in this room" aria-label="Search messages in this room">⌕</button><button class="icon-button hidden" id="manageRoomButton" title="Manage this room" aria-label="Manage this room">⚙</button><button class="icon-button" id="inviteButton" title="Copy room link" aria-label="Copy room link">↗</button></div>
         </header>
 
         <section class="conversation" id="conversation">
@@ -116,9 +116,11 @@
           </div>
           <div class="chat-view hidden" id="chatView">
             <div class="room-intro"><div class="room-symbol" id="roomSymbol">#</div><div><div class="room-kicker">YOU'RE IN</div><h1 id="roomHeading">the room</h1></div><span class="room-privacy-pill" id="roomPrivacyPill">PUBLIC</span><span class="room-intro-line"></span><span class="room-description" id="roomDescription">A place to talk.</span></div>
+            <div class="search-context-banner hidden" id="searchContextBanner"><span id="searchContextLabel">Showing a search result from this room.</span><button type="button" id="returnToLatest">Return to latest</button></div>
             <div class="message-stream" id="messageStream" aria-live="polite"></div>
             <div class="typing-line" id="typingLine"></div>
             <div class="asset-picker hidden" id="assetPicker"><div class="asset-picker-heading"><strong>Room emoji</strong><span id="emojiSlotHint">0 / 50</span></div><div class="asset-picker-grid" id="emojiPickerGrid"></div><div class="asset-picker-heading sticker-picker-heading"><strong>Stickers</strong><span id="stickerSlotHint">0 / 10</span></div><div class="sticker-picker-grid" id="stickerPickerGrid"></div></div>
+            <div class="replying-banner hidden" id="replyingBanner"><span id="replyingLabel"></span><button type="button" id="cancelReply" aria-label="Cancel reply">×</button></div>
             <form class="composer" id="messageForm"><button type="button" class="composer-plus" id="emojiButton" aria-label="Choose a room emoji or sticker" aria-expanded="false">☺</button><input id="messageInput" maxlength="2000" autocomplete="off" placeholder="Say something kind..." aria-label="Write a message" /><span class="composer-hint">↵</span><button class="send-button" type="submit" aria-label="Send message">↑</button></form>
             <div class="composer-foot"><span>Be kind. This is a shared space.</span><span><kbd>ENTER</kbd> TO SEND</span></div>
           </div>
