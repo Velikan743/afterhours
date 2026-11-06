@@ -74,3 +74,4 @@
 .room-logo-preview img{width:100%;height:100%;object-fit:cover}
 .room-logo-actions{display:flex;align-items:center;gap:8px}
 .room-logo-actions .button{padding:8px 11px;font-size:11px}
+.person-row{gap:8px}.person-remove{flex:none;width:24px;height:24px;padding:0;border:1px solid transparent;border-radius:6px;background:transparent;color:#ac8173;font:600 18px/1 var(--font);cursor:pointer;opacity:.7}.person-remove:hover,.person-remove:focus-visible{border-color:#67463c;background:#33241f;color:#ffb09a;opacity:1;outline:none}.person-row:hover .person-remove{opacity:1}
