@@ -230,6 +230,13 @@ html[data-site-theme="light"] .chat-view .message-reply-preview,
 html[data-site-theme="light"] .chat-view .replying-banner{color:#303b30}
 html[data-site-theme="light"] .chat-view .message-sticker-unavailable{color:#596558}
 html[data-site-theme="light"] .chat-view .room-intro h1{color:#20291f}
+/* Keep the room navigation visible against the light canvas after chat content loads. */
+html[data-site-theme="light"] .main-panel{display:grid;grid-template-rows:44px minmax(0,1fr);height:100%;min-height:0;overflow:hidden}
+html[data-site-theme="light"] .topbar{grid-row:1;display:flex;align-items:center;justify-content:space-between;height:44px;min-height:44px;overflow:visible;padding:0 24px;background:#e8eee5;border-bottom:1px solid #d8e0d6;position:relative;z-index:2}
+html[data-site-theme="light"] .topbar .breadcrumb{display:flex;visibility:visible;opacity:1;color:#596657}
+html[data-site-theme="light"] .topbar .breadcrumb strong,html[data-site-theme="light"] .topbar .crumb-home,html[data-site-theme="light"] .topbar .icon-button{color:#263324}
+html[data-site-theme="light"] .topbar .secure-label{color:#596657}
+html[data-site-theme="light"] .conversation{grid-row:2;min-height:0;height:100%;overflow:hidden}
 html[data-site-theme="light"] .people-panel .person-name,
 html[data-site-theme="light"] .people-panel .people-footer,
 html[data-site-theme="light"] .people-panel .people-empty{color:#465346}
