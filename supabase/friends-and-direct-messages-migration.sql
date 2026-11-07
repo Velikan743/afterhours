@@ -150,7 +150,7 @@ begin
   perform pg_advisory_xact_lock(hashtextextended(v_low::text||':'||v_high::text,0));
   select c.room_id into v_room from public.room_direct_conversations c where c.user_low=v_low and c.user_high=v_high;
   if v_room is null then
-    v_name:='dm-'||substr(encode(digest(v_low::text||':'||v_high::text,'sha256'),'hex'),1,28);
+    v_name:='dm-'||substr(replace(pg_catalog.gen_random_uuid()::text,'-',''),1,28);
     insert into public.rooms(name,created_by,is_private,is_direct) values(v_name,v_me,true,true) returning id into v_room;
     insert into public.room_members(room_id,user_id) values(v_room,p_friend_id) on conflict do nothing;
     insert into public.room_direct_conversations(room_id,user_low,user_high) values(v_room,v_low,v_high);
