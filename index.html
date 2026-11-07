@@ -79,6 +79,7 @@
         <div class="room-list" id="roomList">
           <div class="room-placeholder">Your rooms will show up here.</div>
         </div>
+        <button class="friends-nav-button" id="friendsNavButton" type="button"><span>♧</span><span>Friends</span><span class="friend-request-badge hidden" id="friendRequestBadge">0</span></button>
 
         <div class="sidebar-bottom">
           <div class="sidebar-note"><span class="note-icon">✳</span><span>A little room to<br />be yourself.</span></div>
@@ -115,6 +116,12 @@
             </section>
             <div class="welcome-foot"><span class="foot-stars">✳ &nbsp; ✳ &nbsp; ✳</span><span>MADE FOR THE MOMENTS THAT MATTER</span></div>
           </div>
+          <section class="friends-view hidden" id="friendsView" aria-labelledby="friendsTitle">
+            <div class="friends-page-heading"><div><span class="directory-kicker">YOUR PEOPLE</span><h1 id="friendsTitle">Friends</h1><p>See who’s around and pick up a private conversation.</p></div><label class="friends-search"><span aria-hidden="true">⌕</span><input id="friendSearchInput" type="search" maxlength="32" placeholder="Find someone by username" autocomplete="off" aria-label="Search people by username" /></label></div>
+            <div class="friend-search-results hidden" id="friendSearchResults" aria-live="polite"></div>
+            <section class="friend-requests-section hidden" id="friendRequestsSection"><h2>Friend requests <span id="friendRequestsCount">0</span></h2><div id="friendRequestsList"></div></section>
+            <section class="friends-list-section"><h2>Your friends <span id="friendsCount">0</span></h2><div class="friends-list" id="friendsList"></div></section>
+          </section>
           <div class="chat-view hidden" id="chatView">
             <div class="room-intro"><div class="room-symbol" id="roomSymbol">#</div><div><div class="room-kicker">YOU'RE IN</div><h1 id="roomHeading">the room</h1></div><span class="room-privacy-pill" id="roomPrivacyPill">PUBLIC</span><span class="room-intro-line"></span><span class="room-description" id="roomDescription">A place to talk.</span></div>
             <div class="search-context-banner hidden" id="searchContextBanner"><span id="searchContextLabel">Showing a search result from this room.</span><button type="button" id="returnToLatest">Return to latest</button></div>
