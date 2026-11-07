@@ -212,3 +212,33 @@ html[data-site-theme="dark"] .site-theme-picker{border-color:#25262a}
 html[data-site-theme="dark"] .profile-popover .site-theme-picker button[aria-pressed="true"]{background:#22243a;color:#c9cdfb}
 html[data-site-theme="dark"] .toast{background:#5865f2;color:#fff}
 html[data-site-theme] .chat-view[data-theme="midnight"]{--room-accent:#c2ee70}
+
+/* Keep chat copy readable when the site uses a light surface. */
+html[data-site-theme="light"] .chat-view .message-meta strong,
+html[data-site-theme="light"] .chat-view .message-author-button{color:#20291f}
+html[data-site-theme="light"] .chat-view .message-text,
+html[data-site-theme="light"] .chat-view .message.own .message-text{color:#303b30}
+html[data-site-theme="light"] .chat-view .message-meta time,
+html[data-site-theme="light"] .chat-view .message-actions button,
+html[data-site-theme="light"] .chat-view .date-divider,
+html[data-site-theme="light"] .chat-view .typing-line,
+html[data-site-theme="light"] .chat-view .room-kicker,
+html[data-site-theme="light"] .chat-view .room-description,
+html[data-site-theme="light"] .chat-view .composer-foot,
+html[data-site-theme="light"] .chat-view .composer-hint{color:#596558}
+html[data-site-theme="light"] .chat-view .message-reply-preview,
+html[data-site-theme="light"] .chat-view .replying-banner{color:#303b30}
+html[data-site-theme="light"] .chat-view .message-sticker-unavailable{color:#596558}
+html[data-site-theme="light"] .chat-view .room-intro h1{color:#20291f}
+html[data-site-theme="light"] .people-panel .person-name,
+html[data-site-theme="light"] .people-panel .people-footer,
+html[data-site-theme="light"] .people-panel .people-empty{color:#465346}
+html[data-site-theme="light"] .friends-view .friends-page-heading p,
+html[data-site-theme="light"] .friends-view .friend-copy small,
+html[data-site-theme="light"] .friends-view .friend-online-status,
+html[data-site-theme="light"] .friends-view .friend-view-empty{color:#4d5b4e}
+html[data-site-theme="light"] .friends-view .friend-copy strong,
+html[data-site-theme="light"] .friends-view .friends-list-section h2,
+html[data-site-theme="light"] .friends-view .friend-requests-section h2{color:#20291f}
+html[data-site-theme="light"] .friends-view .friend-online-status i{background:#687568}
+html[data-site-theme="light"] .friends-view .friend-online-status.online i{background:#4e8128}
