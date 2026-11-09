@@ -230,6 +230,22 @@ html[data-site-theme="light"] .chat-view .message-reply-preview,
 html[data-site-theme="light"] .chat-view .replying-banner{color:#303b30}
 html[data-site-theme="light"] .chat-view .message-sticker-unavailable{color:#596558}
 html[data-site-theme="light"] .chat-view .room-intro h1{color:#20291f}
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .message-meta strong,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .message-author-button,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .message-text,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .message.own .message-text,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .room-intro h1,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .message-reply-preview,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .replying-banner{color:#e9eee9}
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .message-meta time,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .message-actions button,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .date-divider,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .typing-line,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .room-kicker,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .room-description,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .composer-foot,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .composer-hint,
+html[data-site-theme="light"] .chat-view[data-theme="midnight"] .message-sticker-unavailable{color:#a0aaa1}
 /* Keep the room navigation visible against the light canvas after chat content loads. */
 html[data-site-theme="light"] .main-panel{display:grid;grid-template-rows:44px minmax(0,1fr);height:100%;min-height:0;overflow:hidden}
 html[data-site-theme="light"] .topbar{grid-row:1;display:flex;align-items:center;justify-content:space-between;height:44px;min-height:44px;overflow:visible;padding:0 24px;background:#e8eee5;border-bottom:1px solid #d8e0d6;position:relative;z-index:2}
