@@ -8,7 +8,7 @@ create table if not exists public.rooms (
   created_by uuid not null references auth.users(id) on delete cascade,
   is_private boolean not null default false,
   invite_code text not null default replace(gen_random_uuid()::text, '-', ''),
-  theme_id text not null default 'midnight' check (theme_id in ('midnight','ocean','moss','lavender','sunset','rose','amber','forest','plum','mono','aurora','paper','terminal','arcade','sakura','blueprint','cosmos','desert','vaporwave','chalkboard','custom')),
+  theme_id text not null default 'midnight' check (theme_id in ('midnight','clean','ocean','moss','lavender','sunset','rose','amber','forest','plum','mono','aurora','paper','terminal','arcade','sakura','blueprint','cosmos','desert','vaporwave','chalkboard','custom')),
   custom_background_path text,
   logo_path text,
   created_at timestamptz not null default now()
